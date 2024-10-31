@@ -1,0 +1,6 @@
+@IllyrianAPI_HostAddress = http://localhost:5024
+
+GET {{IllyrianAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
