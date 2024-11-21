@@ -33,13 +33,21 @@ public partial class IllyrianContext : DbContext
 
     public virtual DbSet<Language> Language { get; set; }
 
+    public virtual DbSet<Logs> Logs { get; set; }
+
     public virtual DbSet<MembershipTypes> MembershipTypes { get; set; }
 
     public virtual DbSet<Memberships> Memberships { get; set; }
 
+    public virtual DbSet<Menu> Menu { get; set; }
+
     public virtual DbSet<Payments> Payments { get; set; }
 
+    public virtual DbSet<RoleMenus> RoleMenus { get; set; }
+
     public virtual DbSet<Schedule> Schedule { get; set; }
+
+    public virtual DbSet<StatusType> StatusType { get; set; }
 
     public virtual DbSet<Test> Test { get; set; }
 
@@ -49,7 +57,7 @@ public partial class IllyrianContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-0M3P5Q2;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True", x => x.UseNetTopologySuite());
+        => optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True", x => x.UseNetTopologySuite());
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -167,6 +175,24 @@ public partial class IllyrianContext : DbContext
             entity.Property(e => e.Notes).HasMaxLength(255);
         });
 
+        modelBuilder.Entity<Logs>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Logs__3214EC07EB0E13EF");
+
+            entity.Property(e => e.Action).HasMaxLength(100);
+            entity.Property(e => e.Controller).HasMaxLength(100);
+            entity.Property(e => e.HttpMethod).HasMaxLength(10);
+            entity.Property(e => e.InsertedDate).HasColumnType("datetime");
+            entity.Property(e => e.Ip).HasMaxLength(50);
+            entity.Property(e => e.Url).HasMaxLength(200);
+            entity.Property(e => e.UserId).HasMaxLength(450);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Logs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Logs_UserId");
+        });
+
         modelBuilder.Entity<MembershipTypes>(entity =>
         {
             entity.HasKey(e => e.MembershipTypeId).HasName("PK__Membersh__F35A3E5965F0D49D");
@@ -201,6 +227,34 @@ public partial class IllyrianContext : DbContext
                 .HasConstraintName("FK__Membershi__UserI__72C60C4A");
         });
 
+        modelBuilder.Entity<Menu>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Menu__3214EC076025AA71");
+
+            entity.Property(e => e.Created).HasColumnType("datetime");
+            entity.Property(e => e.CreatedBy).HasMaxLength(450);
+            entity.Property(e => e.Icon).HasMaxLength(100);
+            entity.Property(e => e.Modified).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+            entity.Property(e => e.NameEn).HasMaxLength(100);
+            entity.Property(e => e.NameSq).HasMaxLength(100);
+            entity.Property(e => e.NameSr).HasMaxLength(100);
+            entity.Property(e => e.Path).HasMaxLength(200);
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.MenuCreatedByNavigation)
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Menu_CreatedBy");
+
+            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.MenuModifiedByNavigation)
+                .HasForeignKey(d => d.ModifiedBy)
+                .HasConstraintName("FK_Menu_ModifiedBy");
+
+            entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
+                .HasForeignKey(d => d.ParentId)
+                .HasConstraintName("FK_Menu_ParentId");
+        });
+
         modelBuilder.Entity<Payments>(entity =>
         {
             entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A589CE31E65");
@@ -229,6 +283,36 @@ public partial class IllyrianContext : DbContext
                 .HasConstraintName("FK__Payments__UserID__76969D2E");
         });
 
+        modelBuilder.Entity<RoleMenus>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__RoleMenu__3214EC072959D2D2");
+
+            entity.Property(e => e.Created).HasColumnType("datetime");
+            entity.Property(e => e.CreatedBy).HasMaxLength(450);
+            entity.Property(e => e.Modified).HasColumnType("datetime");
+            entity.Property(e => e.ModifiedBy).HasMaxLength(450);
+            entity.Property(e => e.RoleId).HasMaxLength(450);
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RoleMenusCreatedByNavigation)
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RoleMenus_CreatedBy");
+
+            entity.HasOne(d => d.Menu).WithMany(p => p.RoleMenus)
+                .HasForeignKey(d => d.MenuId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RoleMenus_MenuId");
+
+            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.RoleMenusModifiedByNavigation)
+                .HasForeignKey(d => d.ModifiedBy)
+                .HasConstraintName("FK_RoleMenus_ModifiedBy");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.RoleMenus)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RoleMenus_RoleId");
+        });
+
         modelBuilder.Entity<Schedule>(entity =>
         {
             entity.HasKey(e => e.ScheduleId).HasName("PK__Schedule__9C8A5B69AC6F8FB5");
@@ -237,6 +321,28 @@ public partial class IllyrianContext : DbContext
             entity.Property(e => e.DayOfWeek).HasMaxLength(10);
             entity.Property(e => e.EndTime).HasColumnType("datetime");
             entity.Property(e => e.StartTime).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<StatusType>(entity =>
+        {
+            entity.HasKey(e => e.StatusTypeId).HasName("PK__StatusTy__A84F3C734D3330DE");
+
+            entity.Property(e => e.InsertedDate).HasColumnType("datetime");
+            entity.Property(e => e.InsertedFrom).HasMaxLength(450);
+            entity.Property(e => e.NameEn).HasMaxLength(100);
+            entity.Property(e => e.NameSq).HasMaxLength(100);
+            entity.Property(e => e.NameSr).HasMaxLength(100);
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedFrom).HasMaxLength(450);
+
+            entity.HasOne(d => d.InsertedFromNavigation).WithMany(p => p.StatusTypeInsertedFromNavigation)
+                .HasForeignKey(d => d.InsertedFrom)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StatusType_InsertedFrom");
+
+            entity.HasOne(d => d.UpdatedFromNavigation).WithMany(p => p.StatusTypeUpdatedFromNavigation)
+                .HasForeignKey(d => d.UpdatedFrom)
+                .HasConstraintName("FK_StatusType_UpdatedFrom");
         });
 
         modelBuilder.Entity<Test>(entity =>

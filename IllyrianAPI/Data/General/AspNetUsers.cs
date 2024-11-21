@@ -75,9 +75,23 @@ public partial class AspNetUsers
 
     public virtual Language? Language { get; set; }
 
+    public virtual ICollection<Logs> Logs { get; set; } = new List<Logs>();
+
     public virtual ICollection<Memberships> Memberships { get; set; } = new List<Memberships>();
 
+    public virtual ICollection<Menu> MenuCreatedByNavigation { get; set; } = new List<Menu>();
+
+    public virtual ICollection<Menu> MenuModifiedByNavigation { get; set; } = new List<Menu>();
+
     public virtual ICollection<Payments> Payments { get; set; } = new List<Payments>();
+
+    public virtual ICollection<RoleMenus> RoleMenusCreatedByNavigation { get; set; } = new List<RoleMenus>();
+
+    public virtual ICollection<RoleMenus> RoleMenusModifiedByNavigation { get; set; } = new List<RoleMenus>();
+
+    public virtual ICollection<StatusType> StatusTypeInsertedFromNavigation { get; set; } = new List<StatusType>();
+
+    public virtual ICollection<StatusType> StatusTypeUpdatedFromNavigation { get; set; } = new List<StatusType>();
 
     public virtual ICollection<UserClasses> UserClasses { get; set; } = new List<UserClasses>();
 

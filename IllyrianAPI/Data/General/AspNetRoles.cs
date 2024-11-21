@@ -21,5 +21,7 @@ public partial class AspNetRoles
 
     public virtual ICollection<AspNetRoleClaims> AspNetRoleClaims { get; set; } = new List<AspNetRoleClaims>();
 
+    public virtual ICollection<RoleMenus> RoleMenus { get; set; } = new List<RoleMenus>();
+
     public virtual ICollection<AspNetUsers> User { get; set; } = new List<AspNetUsers>();
 }
