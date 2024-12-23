@@ -143,18 +143,16 @@ namespace IllyrianAPI.Controllers
         }
 
         [HttpPost("register-role")]
-        //[Authorize(Roles = "Admin")] // Only admins should be allowed to create new roles
+        //[Authorize(Roles = "Admin")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterRole([FromBody] RegisterRole model)
         {
-            // Check if the role already exists
             var roleExists = await _roleManager.RoleExistsAsync(model.Name_EN);
             if (roleExists)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "Role already exists!" });
             }
 
-            // Create a new role
             ApplicationRole newRole = new ApplicationRole
             {
                 Name = model.Name_EN,
@@ -164,7 +162,6 @@ namespace IllyrianAPI.Controllers
                 NormalizedName = model.Name_EN.ToUpper()
             };
 
-            // Save the role to the database
             var result = await _roleManager.CreateAsync(newRole);
             if (!result.Succeeded)
             {
@@ -178,14 +175,10 @@ namespace IllyrianAPI.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            // Clear the existing external cookie
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            // Clear the main authentication cookie
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
-            // You might also want to revoke the JWT token if you're using token-based authentication
-            // This would typically involve adding the token to a blacklist or updating its status in a database
 
             return Ok(new { message = "Logged out successfully" });
         }

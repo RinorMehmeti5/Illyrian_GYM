@@ -22,7 +22,6 @@ namespace IllyrianAPI.Controllers
             _userManager = userManager;
         }
 
-        // You can add common methods here that all controllers might need
         protected async Task<ApplicationUser> GetCurrentUserAsync()
         {
             return await _userManager.GetUserAsync(User);

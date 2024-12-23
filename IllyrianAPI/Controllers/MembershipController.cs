@@ -21,7 +21,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/Membership
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MembershipDTO>>> GetMemberships()
         {
@@ -50,7 +49,6 @@ namespace IllyrianAPI.Controllers
             return memberships;
         }
 
-        // GET: api/Membership/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MembershipDTO>> GetMembership(int id)
         {
@@ -85,7 +83,6 @@ namespace IllyrianAPI.Controllers
             return membership;
         }
 
-        // POST: api/Membership
         [HttpPost]
         public async Task<ActionResult<MembershipDTO>> PostMembership(MembershipDTO membershipDTO)
         {
@@ -101,7 +98,6 @@ namespace IllyrianAPI.Controllers
             _db.Memberships.Add(membership);
             await _db.SaveChangesAsync();
 
-            // Reload the membership with related data
             await _db.Entry(membership)
                 .Reference(m => m.User)
                 .LoadAsync();
@@ -130,7 +126,6 @@ namespace IllyrianAPI.Controllers
             return CreatedAtAction(nameof(GetMembership), new { id = membership.MembershipId }, createdMembershipDTO);
         }
 
-        // PUT: api/Membership/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMembership(int id, MembershipDTO membershipDTO)
         {
@@ -170,7 +165,6 @@ namespace IllyrianAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Membership/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMembership(int id)
         {

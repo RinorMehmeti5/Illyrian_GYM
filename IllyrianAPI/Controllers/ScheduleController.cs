@@ -1,5 +1,4 @@
-﻿// Controllers/ScheduleController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IllyrianAPI.Data.General;
 using IllyrianAPI.Data.Core;
@@ -22,7 +21,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/Schedule
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ScheduleDTO>>> GetSchedules()
         {
@@ -42,7 +40,6 @@ namespace IllyrianAPI.Controllers
             return schedules;
         }
 
-        // GET: api/Schedule/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ScheduleDTO>> GetSchedule(int id)
         {
@@ -68,7 +65,6 @@ namespace IllyrianAPI.Controllers
             return schedule;
         }
 
-        // POST: api/Schedule
         [HttpPost]
         public async Task<ActionResult<ScheduleDTO>> PostSchedule(ScheduleDTO scheduleDTO)
         {
@@ -82,7 +78,6 @@ namespace IllyrianAPI.Controllers
             _db.Schedule.Add(schedule);
             await _db.SaveChangesAsync();
 
-            // Map the saved entity back to DTO
             var createdScheduleDTO = new ScheduleDTO
             {
                 ScheduleId = schedule.ScheduleId,
@@ -97,7 +92,6 @@ namespace IllyrianAPI.Controllers
             return CreatedAtAction(nameof(GetSchedule), new { id = schedule.ScheduleId }, createdScheduleDTO);
         }
 
-        // PUT: api/Schedule/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
         {
@@ -135,7 +129,6 @@ namespace IllyrianAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Schedule/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {

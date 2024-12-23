@@ -1,5 +1,4 @@
-﻿// Controllers/ExercisesController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IllyrianAPI.Data.General;
 using IllyrianAPI.Data.Core;
@@ -21,7 +20,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/Exercises
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExerciseDTO>>> GetExercises()
         {
@@ -39,7 +37,6 @@ namespace IllyrianAPI.Controllers
             return exercises;
         }
 
-        // GET: api/Exercises/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ExerciseDTO>> GetExercise(int id)
         {
@@ -63,7 +60,6 @@ namespace IllyrianAPI.Controllers
             return exercise;
         }
 
-        // POST: api/Exercises
         [HttpPost]
         public async Task<ActionResult<ExerciseDTO>> PostExercise(ExerciseDTO exerciseDTO)
         {
@@ -78,7 +74,6 @@ namespace IllyrianAPI.Controllers
             _db.Exercises.Add(exercise);
             await _db.SaveChangesAsync();
 
-            // Map the saved entity back to DTO
             var createdExerciseDTO = new ExerciseDTO
             {
                 ExerciseId = exercise.ExerciseId,
@@ -91,7 +86,6 @@ namespace IllyrianAPI.Controllers
             return CreatedAtAction(nameof(GetExercise), new { id = exercise.ExerciseId }, createdExerciseDTO);
         }
 
-        // PUT: api/Exercises/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(int id, ExerciseDTO exerciseDTO)
         {
@@ -130,7 +124,6 @@ namespace IllyrianAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Exercises/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
