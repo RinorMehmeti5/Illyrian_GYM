@@ -25,7 +25,6 @@ namespace IllyrianAPI.Controllers
             _logger = logger;
         }
 
-        // GET: api/Membership
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MembershipDTO>>> GetMemberships()
         {
@@ -67,7 +66,6 @@ namespace IllyrianAPI.Controllers
             }
         }
 
-        // GET: api/Membership/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MembershipDTO>> GetMembership(int id)
         {
@@ -114,7 +112,6 @@ namespace IllyrianAPI.Controllers
             }
         }
 
-        // POST: api/Membership
         [HttpPost]
         public async Task<ActionResult<MembershipDTO>> PostMembership(MembershipDTO membershipDTO)
         {
@@ -167,7 +164,6 @@ namespace IllyrianAPI.Controllers
             }
         }
 
-        // PUT: api/Membership/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMembership(int id, MembershipDTO membershipDTO)
         {
@@ -215,7 +211,6 @@ namespace IllyrianAPI.Controllers
             }
         }
 
-        // DELETE: api/Membership/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMembership(int id)
         {

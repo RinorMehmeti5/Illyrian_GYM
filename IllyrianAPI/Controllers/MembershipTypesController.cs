@@ -21,7 +21,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/MembershipTypes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MembershipTypeDTO>>> GetMembershipTypes()
         {
@@ -39,7 +38,6 @@ namespace IllyrianAPI.Controllers
             return membershipTypes;
         }
 
-        // GET: api/MembershipTypes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MembershipTypeDTO>> GetMembershipType(int id)
         {
@@ -63,7 +61,6 @@ namespace IllyrianAPI.Controllers
             return membershipType;
         }
 
-        // POST: api/MembershipTypes
         [HttpPost]
         public async Task<ActionResult<MembershipTypeDTO>> PostMembershipType(MembershipTypeDTO membershipTypeDTO)
         {
@@ -85,7 +82,6 @@ namespace IllyrianAPI.Controllers
             return CreatedAtAction(nameof(GetMembershipType), new { id = membershipType.MembershipTypeId }, membershipTypeDTO);
         }
 
-        // PUT: api/MembershipTypes/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMembershipType(int id, MembershipTypeDTO membershipTypeDTO)
         {
@@ -124,7 +120,6 @@ namespace IllyrianAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/MembershipTypes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMembershipType(int id)
         {

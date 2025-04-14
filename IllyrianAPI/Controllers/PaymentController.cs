@@ -21,7 +21,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/Payment
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDTO>>> GetPayments()
         {
@@ -49,7 +48,6 @@ namespace IllyrianAPI.Controllers
             return payments;
         }
 
-        // GET: api/Payment/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDTO>> GetPayment(int id)
         {
@@ -83,7 +81,6 @@ namespace IllyrianAPI.Controllers
             return payment;
         }
 
-        // POST: api/Payment
         [HttpPost]
         public async Task<ActionResult<PaymentDTO>> PostPayment(PaymentDTO paymentDTO)
         {
@@ -100,16 +97,6 @@ namespace IllyrianAPI.Controllers
 
             _db.Payments.Add(payment);
             await _db.SaveChangesAsync();
-
-            // Reload the payment with related data
-            //await _db.Entry(payment)
-            //    .Reference(p => p.User)
-            //    .LoadAsync();
-            //await _db.Entry(payment)
-            //    .Reference(p => p.Membership)
-            //    .Query()
-            //    .Include(m => m.MembershipType)
-            //    .LoadAsync();
 
             var createdPaymentDTO = new PaymentDTO
             {
@@ -130,7 +117,6 @@ namespace IllyrianAPI.Controllers
             return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, createdPaymentDTO);
         }
 
-        // PUT: api/Payment/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPayment(int id, PaymentDTO paymentDTO)
         {
@@ -172,7 +158,6 @@ namespace IllyrianAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Payment/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(int id)
         {

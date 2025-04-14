@@ -18,7 +18,6 @@ namespace IllyrianAPI.Controllers
         {
         }
 
-        // GET: api/Test
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Test>>> GetTests()
@@ -26,7 +25,6 @@ namespace IllyrianAPI.Controllers
             return await _db.Test.ToListAsync();
         }
 
-        // GET: api/Test/5
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<Test>> GetTest(int id)
