@@ -29,7 +29,7 @@ namespace IllyrianAPI.Controllers
         }
 
         [NonAction]
-        public string FormatDuration(int days)
+        public static string FormatDuration(int days)
         {
             if (days % 365 == 0)
             {
@@ -48,13 +48,13 @@ namespace IllyrianAPI.Controllers
         }
 
         [NonAction]
-        public string FormatPrice(decimal price)
+        public static string FormatPrice(decimal price)
         {
             return price.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
         }
 
         [NonAction]
-        public string FormatDate(DateTime date)
+        public static string FormatDate(DateTime date)
         {
             return date.ToString("yyyy-MM-dd");
         }
