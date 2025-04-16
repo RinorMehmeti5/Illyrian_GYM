@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using IllyrianAPI.Models.Membership;
 using System.Globalization;
+using IllyrianAPI.Models.MembershipType;
 
 namespace IllyrianAPI.Controllers
 {
@@ -238,5 +239,36 @@ namespace IllyrianAPI.Controllers
         {
             return _db.Memberships.Any(e => e.MembershipId == id);
         }
+
+        [HttpGet("types")]
+        public async Task<ActionResult<IEnumerable<MembershipTypeDTO>>> GetMembershipTypes()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all membership types");
+
+                var membershipTypes = await _db.MembershipTypes
+                    .Select(mt => new MembershipTypeDTO
+                    {
+                        MembershipTypeID = mt.MembershipTypeId,
+                        Name = mt.Name,
+                        Description = mt.Description,
+                        DurationInDays = mt.DurationInDays,
+                        Price = mt.Price,
+                        FormattedDuration = FormatDuration(mt.DurationInDays),
+                        FormattedPrice = FormatPrice(mt.Price)
+                    })
+                    .ToListAsync();
+
+                return membershipTypes;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting membership types");
+                return StatusCode(500, new { message = "An error occurred while fetching membership types", error = ex.Message });
+            }
+        }
+
+
     }
 }

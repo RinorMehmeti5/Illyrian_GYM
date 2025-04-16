@@ -1,3 +1,3 @@
-Scaffold-DbContext "Server=DESKTOP-0M3P5Q2;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir .\Data\General -Context IllyrianContext -Force -NoPluralize
+Scaffold-DbContext "Server=127.0.0.1;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir .\Data\General -Context IllyrianContext -Force -NoPluralize
 
 Scaffold-DbContext "Server=localhost\SQLEXPRESS;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir .\Data\General -Context IllyrianContext -Force -NoPluralize

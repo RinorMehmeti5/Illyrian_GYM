@@ -57,7 +57,7 @@ public partial class IllyrianContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-0M3P5Q2;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True", x => x.UseNetTopologySuite());
+        => optionsBuilder.UseSqlServer("Server=127.0.0.1;Database=Illyrian;Trusted_Connection=True;TrustServerCertificate=True", x => x.UseNetTopologySuite());
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,6 +111,8 @@ public partial class IllyrianContext : DbContext
         modelBuilder.Entity<AspNetUsers>(entity =>
         {
             entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+
+            entity.HasIndex(e => e.LanguageId, "IX_AspNetUsers_LanguageID");
 
             entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex")
                 .IsUnique()
@@ -179,13 +181,14 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Logs__3214EC07EB0E13EF");
 
+            entity.HasIndex(e => e.UserId, "IX_Logs_UserId");
+
             entity.Property(e => e.Action).HasMaxLength(100);
             entity.Property(e => e.Controller).HasMaxLength(100);
             entity.Property(e => e.HttpMethod).HasMaxLength(10);
             entity.Property(e => e.InsertedDate).HasColumnType("datetime");
             entity.Property(e => e.Ip).HasMaxLength(50);
             entity.Property(e => e.Url).HasMaxLength(200);
-            entity.Property(e => e.UserId).HasMaxLength(450);
 
             entity.HasOne(d => d.User).WithMany(p => p.Logs)
                 .HasForeignKey(d => d.UserId)
@@ -207,14 +210,16 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.MembershipId).HasName("PK__Membersh__92A78599B1A25C56");
 
+            entity.HasIndex(e => e.MembershipTypeId, "IX_Memberships_MembershipTypeID");
+
+            entity.HasIndex(e => e.UserId, "IX_Memberships_UserID");
+
             entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
             entity.Property(e => e.EndDate).HasColumnType("datetime");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.MembershipTypeId).HasColumnName("MembershipTypeID");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(450)
-                .HasColumnName("UserID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.MembershipType).WithMany(p => p.Memberships)
                 .HasForeignKey(d => d.MembershipTypeId)
@@ -231,11 +236,15 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Menu__3214EC076025AA71");
 
+            entity.HasIndex(e => e.CreatedBy, "IX_Menu_CreatedBy");
+
+            entity.HasIndex(e => e.ModifiedBy, "IX_Menu_ModifiedBy");
+
+            entity.HasIndex(e => e.ParentId, "IX_Menu_ParentId");
+
             entity.Property(e => e.Created).HasColumnType("datetime");
-            entity.Property(e => e.CreatedBy).HasMaxLength(450);
             entity.Property(e => e.Icon).HasMaxLength(100);
             entity.Property(e => e.Modified).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedBy).HasMaxLength(450);
             entity.Property(e => e.NameEn).HasMaxLength(100);
             entity.Property(e => e.NameSq).HasMaxLength(100);
             entity.Property(e => e.NameSr).HasMaxLength(100);
@@ -259,6 +268,10 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A589CE31E65");
 
+            entity.HasIndex(e => e.MembershipId, "IX_Payments_MembershipID");
+
+            entity.HasIndex(e => e.UserId, "IX_Payments_UserID");
+
             entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
             entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.MembershipId).HasColumnName("MembershipID");
@@ -268,9 +281,7 @@ public partial class IllyrianContext : DbContext
             entity.Property(e => e.TransactionId)
                 .HasMaxLength(100)
                 .HasColumnName("TransactionID");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(450)
-                .HasColumnName("UserID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Membership).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.MembershipId)
@@ -287,11 +298,16 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__RoleMenu__3214EC072959D2D2");
 
+            entity.HasIndex(e => e.CreatedBy, "IX_RoleMenus_CreatedBy");
+
+            entity.HasIndex(e => e.MenuId, "IX_RoleMenus_MenuId");
+
+            entity.HasIndex(e => e.ModifiedBy, "IX_RoleMenus_ModifiedBy");
+
+            entity.HasIndex(e => e.RoleId, "IX_RoleMenus_RoleId");
+
             entity.Property(e => e.Created).HasColumnType("datetime");
-            entity.Property(e => e.CreatedBy).HasMaxLength(450);
             entity.Property(e => e.Modified).HasColumnType("datetime");
-            entity.Property(e => e.ModifiedBy).HasMaxLength(450);
-            entity.Property(e => e.RoleId).HasMaxLength(450);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RoleMenusCreatedByNavigation)
                 .HasForeignKey(d => d.CreatedBy)
@@ -327,13 +343,15 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.StatusTypeId).HasName("PK__StatusTy__A84F3C734D3330DE");
 
+            entity.HasIndex(e => e.InsertedFrom, "IX_StatusType_InsertedFrom");
+
+            entity.HasIndex(e => e.UpdatedFrom, "IX_StatusType_UpdatedFrom");
+
             entity.Property(e => e.InsertedDate).HasColumnType("datetime");
-            entity.Property(e => e.InsertedFrom).HasMaxLength(450);
             entity.Property(e => e.NameEn).HasMaxLength(100);
             entity.Property(e => e.NameSq).HasMaxLength(100);
             entity.Property(e => e.NameSr).HasMaxLength(100);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
-            entity.Property(e => e.UpdatedFrom).HasMaxLength(450);
 
             entity.HasOne(d => d.InsertedFromNavigation).WithMany(p => p.StatusTypeInsertedFromNavigation)
                 .HasForeignKey(d => d.InsertedFrom)
@@ -359,11 +377,13 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.UserClassId).HasName("PK__UserClas__151870CF1013FE44");
 
+            entity.HasIndex(e => e.ClassId, "IX_UserClasses_ClassID");
+
+            entity.HasIndex(e => e.UserId, "IX_UserClasses_UserID");
+
             entity.Property(e => e.UserClassId).HasColumnName("UserClassID");
             entity.Property(e => e.ClassId).HasColumnName("ClassID");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(450)
-                .HasColumnName("UserID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Class).WithMany(p => p.UserClasses)
                 .HasForeignKey(d => d.ClassId)
@@ -380,11 +400,13 @@ public partial class IllyrianContext : DbContext
         {
             entity.HasKey(e => e.UserScheduleId).HasName("PK__UsersSch__9659B0319F77889C");
 
+            entity.HasIndex(e => e.ScheduleId, "IX_UsersSchedule_ScheduleID");
+
+            entity.HasIndex(e => e.UserId, "IX_UsersSchedule_UserID");
+
             entity.Property(e => e.UserScheduleId).HasColumnName("UserScheduleID");
             entity.Property(e => e.ScheduleId).HasColumnName("ScheduleID");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(450)
-                .HasColumnName("UserID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.UsersSchedule)
                 .HasForeignKey(d => d.ScheduleId)
