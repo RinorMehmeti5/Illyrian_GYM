@@ -30,41 +30,41 @@ namespace IllyrianAPI.Controllers
         [NonAction]
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            Logs log = null;
             try
             {
-                // Safely get user ID - this works even for anonymous/login requests
-                string userId = "anonymous";
-
-                // Try to get from claims (for authenticated requests)
-                if (context.HttpContext.User.Identity?.IsAuthenticated == true)
-                {
-                    userId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                             context.HttpContext.User.FindFirst("sub")?.Value ??
-                             userId;
-                }
-
-                // For anonymous endpoints like login/register, use a default value
-                bool isAnonymousEndpoint =
-                    context.ActionDescriptor.EndpointMetadata.Any(m => m is AllowAnonymousAttribute) ||
-                    context.ActionDescriptor.RouteValues["action"]?.ToLower() == "login" ||
-                    context.ActionDescriptor.RouteValues["action"]?.ToLower() == "register";
-
-                // Create log entry
-                var log = new Logs
+                // Initialize log entry with default values
+                log = new Logs
                 {
                     Action = context.ActionDescriptor.RouteValues["action"]?.ToString(),
                     Controller = context.ActionDescriptor.RouteValues["controller"]?.ToString(),
                     HttpMethod = context.HttpContext.Request.Method,
                     Ip = context.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                     Url = context.HttpContext.Request.GetDisplayUrl(),
-                    UserId = userId,
                     InsertedDate = DateTime.Now,
                     Error = false
                 };
 
-                // Log request content for non-login actions (to avoid logging passwords)
-                if (context.ActionArguments.Any() &&
-                    !context.ActionDescriptor.RouteValues["action"]?.ToString()?.Equals("login", StringComparison.OrdinalIgnoreCase) == true)
+                // Determine if user is authenticated and set UserId accordingly
+                if (context.HttpContext.User.Identity?.IsAuthenticated == true)
+                {
+                    log.UserId = context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                                 context.HttpContext.User.FindFirst("sub")?.Value;
+                }
+                else
+                {
+                    // For unauthenticated requests, set UserId to null - this is now allowed in the DB
+                    log.UserId = null;
+                }
+
+                // Check if this is a sensitive endpoint like login
+                bool isSensitiveEndpoint =
+                    context.ActionDescriptor.RouteValues["action"]?.ToLower() == "login" ||
+                    context.ActionDescriptor.RouteValues["controller"]?.ToLower() == "auth" &&
+                    context.ActionDescriptor.RouteValues["action"]?.ToLower() == "register";
+
+                // Log request content except for sensitive actions (to avoid logging passwords)
+                if (context.ActionArguments.Any() && !isSensitiveEndpoint)
                 {
                     try
                     {
@@ -80,11 +80,20 @@ namespace IllyrianAPI.Controllers
                         log.FormContent = $"Failed to serialize request: {ex.Message}";
                     }
                 }
+                else if (isSensitiveEndpoint)
+                {
+                    // For sensitive endpoints, log that we intentionally skipped content
+                    log.FormContent = "Content not logged for security reasons (sensitive endpoint)";
+                }
+
+                // Save the initial log entry to capture the request
+                await _db.Logs.AddAsync(log);
+                await _db.SaveChangesAsync();
 
                 // Execute the action
                 var result = await next();
 
-                // Log response
+                // Update the log with response information
                 if (result.Result != null)
                 {
                     try
@@ -121,7 +130,7 @@ namespace IllyrianAPI.Controllers
                 }
 
                 // Log exception if present
-                if (result.Exception != null)
+                if (result.Exception != null && !result.ExceptionHandled)
                 {
                     log.Error = true;
                     log.Exception = JsonSerializer.Serialize(new
@@ -132,22 +141,38 @@ namespace IllyrianAPI.Controllers
                     });
                 }
 
-                // Save log entry - make sure to use a fresh DbContext if needed
-                try
-                {
-                    await _db.Logs.AddAsync(log);
-                    await _db.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    // If logging fails, at least write to console/debug
-                    System.Diagnostics.Debug.WriteLine($"Failed to save log: {ex.Message}");
-                }
+                // Update the log entry
+                _db.Logs.Update(log);
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {
                 // If the filter itself fails, log to debug at minimum
                 System.Diagnostics.Debug.WriteLine($"Error in OnActionExecutionAsync: {ex.Message}");
+
+                // Try to record the error in the log
+                if (log != null)
+                {
+                    try
+                    {
+                        log.Error = true;
+                        log.Exception = JsonSerializer.Serialize(new
+                        {
+                            Message = $"Logging filter failed: {ex.Message}",
+                            StackTrace = ex.StackTrace,
+                            InnerException = ex.InnerException?.Message
+                        });
+
+                        _db.Logs.Update(log);
+                        await _db.SaveChangesAsync();
+                    }
+                    catch
+                    {
+                        // Last resort - can't do much else if even error logging fails
+                        System.Diagnostics.Debug.WriteLine($"Failed to log the error: {ex.Message}");
+                    }
+                }
+
                 // Continue executing the action even if logging fails
                 if (next != null)
                 {
@@ -197,24 +222,7 @@ namespace IllyrianAPI.Controllers
         {
             try
             {
-                // Skip logging if the user is not authenticated
-                if (User.Identity?.IsAuthenticated != true)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error occurred but user is not authenticated: {ex.Message}");
-                    return;
-                }
-
-                // Get the user ID - only for authenticated users
-                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                                User.FindFirst("sub")?.Value;
-
-                // If we can't get a user ID, skip logging to avoid FK constraint violation
-                if (string.IsNullOrEmpty(userId))
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error occurred but couldn't identify user: {ex.Message}");
-                    return;
-                }
-
+                // Create a new log entry for errors that might occur outside the filter
                 var log = new Logs
                 {
                     Action = HttpContext?.Request?.RouteValues["action"]?.ToString(),
@@ -222,7 +230,6 @@ namespace IllyrianAPI.Controllers
                     HttpMethod = HttpContext?.Request?.Method ?? "UNKNOWN",
                     Ip = HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "unknown",
                     Url = HttpContext?.Request != null ? HttpContext.Request.GetDisplayUrl() : "unknown",
-                    UserId = userId,
                     InsertedDate = DateTime.Now,
                     Error = true,
                     Exception = JsonSerializer.Serialize(new
@@ -233,13 +240,24 @@ namespace IllyrianAPI.Controllers
                     })
                 };
 
+                // Set the user ID if available, otherwise leave it as null
+                if (User?.Identity?.IsAuthenticated == true)
+                {
+                    log.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                                User.FindFirst("sub")?.Value;
+                }
+                else
+                {
+                    log.UserId = null; // Will be null for unauthenticated requests
+                }
+
                 await _db.Logs.AddAsync(log);
                 await _db.SaveChangesAsync();
             }
-            catch
+            catch (Exception logEx)
             {
                 // If logging fails, at least write to console/debug
-                System.Diagnostics.Debug.WriteLine($"Failed to log error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Failed to log error: {ex.Message}. Logging error: {logEx.Message}");
             }
         }
     }

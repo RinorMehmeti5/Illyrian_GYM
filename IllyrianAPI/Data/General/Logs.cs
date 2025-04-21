@@ -7,7 +7,7 @@ public partial class Logs
 {
     public long Id { get; set; }
 
-    public string UserId { get; set; } = null!;
+    public string? UserId { get; set; }
 
     public string Ip { get; set; } = null!;
 
@@ -29,5 +29,5 @@ public partial class Logs
 
     public DateTime InsertedDate { get; set; }
 
-    public virtual AspNetUsers User { get; set; } = null!;
+    public virtual AspNetUsers? User { get; set; }
 }
