@@ -89,15 +89,22 @@ namespace IllyrianAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ScheduleDTO>> PostSchedule(ScheduleDTO scheduleDTO)
+        public async Task<ActionResult<ScheduleDTO>> PostSchedule([FromBody] CreateScheduleRequest request)
         {
             try
             {
+                // Parse time strings to proper DateTime objects
+                if (!TryParseTimeString(request.StartTime, out DateTime startTime) ||
+                    !TryParseTimeString(request.EndTime, out DateTime endTime))
+                {
+                    return BadRequest(new { message = "Invalid time format. Use HH:MM format." });
+                }
+
                 var schedule = new Schedule
                 {
-                    StartTime = scheduleDTO.StartTime,
-                    EndTime = scheduleDTO.EndTime,
-                    DayOfWeek = scheduleDTO.DayOfWeek
+                    StartTime = startTime,
+                    EndTime = endTime,
+                    DayOfWeek = request.DayOfWeek
                 };
 
                 _db.Schedule.Add(schedule);
@@ -123,12 +130,34 @@ namespace IllyrianAPI.Controllers
             }
         }
 
+        // Helper method to parse time strings into DateTime
+        private bool TryParseTimeString(string timeString, out DateTime result)
+        {
+            result = DateTime.Today;
+
+            if (string.IsNullOrEmpty(timeString))
+                return false;
+
+            var parts = timeString.Split(':');
+            if (parts.Length != 2)
+                return false;
+
+            if (!int.TryParse(parts[0], out int hours) || !int.TryParse(parts[1], out int minutes))
+                return false;
+
+            if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59)
+                return false;
+
+            result = DateTime.Today.AddHours(hours).AddMinutes(minutes);
+            return true;
+        }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSchedule(int id, ScheduleDTO scheduleDTO)
+        public async Task<IActionResult> PutSchedule(int id, [FromBody] UpdateScheduleRequest request)
         {
             try
             {
-                if (id != scheduleDTO.ScheduleId)
+                if (id != request.ScheduleId)
                 {
                     return BadRequest();
                 }
@@ -139,9 +168,16 @@ namespace IllyrianAPI.Controllers
                     return NotFound();
                 }
 
-                schedule.StartTime = scheduleDTO.StartTime;
-                schedule.EndTime = scheduleDTO.EndTime;
-                schedule.DayOfWeek = scheduleDTO.DayOfWeek;
+                // Parse time strings to proper DateTime objects
+                if (!TryParseTimeString(request.StartTime, out DateTime startTime) ||
+                    !TryParseTimeString(request.EndTime, out DateTime endTime))
+                {
+                    return BadRequest(new { message = "Invalid time format. Use HH:MM format." });
+                }
+
+                schedule.StartTime = startTime;
+                schedule.EndTime = endTime;
+                schedule.DayOfWeek = request.DayOfWeek;
 
                 try
                 {
