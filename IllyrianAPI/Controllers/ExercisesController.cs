@@ -13,130 +13,171 @@ namespace IllyrianAPI.Controllers
     [Authorize]
     public class ExercisesController : BaseController
     {
+        private readonly ILogger<ExercisesController> _logger;
+
         public ExercisesController(
             IllyrianContext db,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            ILogger<ExercisesController> logger
         ) : base(db, userManager)
         {
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExerciseDTO>>> GetExercises()
         {
-            var exercises = await _db.Exercises
-                .Select(e => new ExerciseDTO
-                {
-                    ExerciseId = e.ExerciseId,
-                    ExerciseName = e.ExerciseName,
-                    Description = e.Description,
-                    MuscleGroup = e.MuscleGroup,
-                    DifficultyLevel = e.DifficultyLevel
-                })
-                .ToListAsync();
+            try
+            {
+                _logger.LogInformation("Fetching all exercises");
 
-            return exercises;
+                var exercises = await _db.Exercises
+                    .Select(e => new ExerciseDTO
+                    {
+                        ExerciseId = e.ExerciseId,
+                        ExerciseName = e.ExerciseName,
+                        Description = e.Description,
+                        MuscleGroup = e.MuscleGroup,
+                        DifficultyLevel = e.DifficultyLevel
+                    })
+                    .ToListAsync();
+
+                return exercises;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting exercises");
+                return StatusCode(500, new { message = "An error occurred while fetching exercises", error = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ExerciseDTO>> GetExercise(int id)
         {
-            var exercise = await _db.Exercises
-                .Where(e => e.ExerciseId == id)
-                .Select(e => new ExerciseDTO
-                {
-                    ExerciseId = e.ExerciseId,
-                    ExerciseName = e.ExerciseName,
-                    Description = e.Description,
-                    MuscleGroup = e.MuscleGroup,
-                    DifficultyLevel = e.DifficultyLevel
-                })
-                .FirstOrDefaultAsync();
-
-            if (exercise == null)
+            try
             {
-                return NotFound();
-            }
+                _logger.LogInformation($"Fetching exercise with ID: {id}");
 
-            return exercise;
+                var exercise = await _db.Exercises
+                    .Where(e => e.ExerciseId == id)
+                    .Select(e => new ExerciseDTO
+                    {
+                        ExerciseId = e.ExerciseId,
+                        ExerciseName = e.ExerciseName,
+                        Description = e.Description,
+                        MuscleGroup = e.MuscleGroup,
+                        DifficultyLevel = e.DifficultyLevel
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (exercise == null)
+                {
+                    return NotFound();
+                }
+
+                return exercise;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error getting exercise with ID: {id}");
+                return StatusCode(500, new { message = $"An error occurred while fetching exercise with ID: {id}", error = ex.Message });
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<ExerciseDTO>> PostExercise(ExerciseDTO exerciseDTO)
         {
-            var exercise = new Exercises
+            try
             {
-                ExerciseName = exerciseDTO.ExerciseName,
-                Description = exerciseDTO.Description,
-                MuscleGroup = exerciseDTO.MuscleGroup,
-                DifficultyLevel = exerciseDTO.DifficultyLevel
-            };
+                var exercise = new Exercises
+                {
+                    ExerciseName = exerciseDTO.ExerciseName,
+                    Description = exerciseDTO.Description,
+                    MuscleGroup = exerciseDTO.MuscleGroup,
+                    DifficultyLevel = exerciseDTO.DifficultyLevel
+                };
 
-            _db.Exercises.Add(exercise);
-            await _db.SaveChangesAsync();
+                _db.Exercises.Add(exercise);
+                await _db.SaveChangesAsync();
 
-            var createdExerciseDTO = new ExerciseDTO
+                exerciseDTO.ExerciseId = exercise.ExerciseId;
+
+                return CreatedAtAction(nameof(GetExercise), new { id = exercise.ExerciseId }, exerciseDTO);
+            }
+            catch (Exception ex)
             {
-                ExerciseId = exercise.ExerciseId,
-                ExerciseName = exercise.ExerciseName,
-                Description = exercise.Description,
-                MuscleGroup = exercise.MuscleGroup,
-                DifficultyLevel = exercise.DifficultyLevel
-            };
-
-            return CreatedAtAction(nameof(GetExercise), new { id = exercise.ExerciseId }, createdExerciseDTO);
+                _logger.LogError(ex, "Error creating exercise");
+                return StatusCode(500, new { message = "An error occurred while creating exercise", error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(int id, ExerciseDTO exerciseDTO)
         {
-            if (id != exerciseDTO.ExerciseId)
-            {
-                return BadRequest();
-            }
-
-            var exercise = await _db.Exercises.FindAsync(id);
-            if (exercise == null)
-            {
-                return NotFound();
-            }
-
-            exercise.ExerciseName = exerciseDTO.ExerciseName;
-            exercise.Description = exerciseDTO.Description;
-            exercise.MuscleGroup = exerciseDTO.MuscleGroup;
-            exercise.DifficultyLevel = exerciseDTO.DifficultyLevel;
-
             try
             {
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ExerciseExists(id))
+                if (id != exerciseDTO.ExerciseId)
+                {
+                    return BadRequest();
+                }
+
+                var exercise = await _db.Exercises.FindAsync(id);
+                if (exercise == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                exercise.ExerciseName = exerciseDTO.ExerciseName;
+                exercise.Description = exerciseDTO.Description;
+                exercise.MuscleGroup = exerciseDTO.MuscleGroup;
+                exercise.DifficultyLevel = exerciseDTO.DifficultyLevel;
+
+                try
+                {
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ExerciseExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating exercise with ID: {id}");
+                return StatusCode(500, new { message = $"An error occurred while updating exercise with ID: {id}", error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
-            var exercise = await _db.Exercises.FindAsync(id);
-            if (exercise == null)
+            try
             {
-                return NotFound();
+                var exercise = await _db.Exercises.FindAsync(id);
+                if (exercise == null)
+                {
+                    return NotFound();
+                }
+
+                _db.Exercises.Remove(exercise);
+                await _db.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _db.Exercises.Remove(exercise);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting exercise with ID: {id}");
+                return StatusCode(500, new { message = $"An error occurred while deleting exercise with ID: {id}", error = ex.Message });
+            }
         }
 
         private bool ExerciseExists(int id)
