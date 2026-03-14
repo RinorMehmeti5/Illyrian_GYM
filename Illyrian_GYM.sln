@@ -1,9 +1,24 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.002.0
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11605.240
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IllyrianAPI", "IllyrianAPI\IllyrianAPI.csproj", "{B1CADAE6-15D7-490D-950C-3A99B0B53EB8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1B2C3D4-0001-0000-0000-000000000001}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A1B2C3D4-0002-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.Domain", "src\Illyrian.Domain\Illyrian.Domain.csproj", "{A1B2C3D4-1001-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.Persistence", "src\Illyrian.Persistence\Illyrian.Persistence.csproj", "{A1B2C3D4-1002-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.PersistenceSql", "src\Illyrian.PersistenceSql\Illyrian.PersistenceSql.csproj", "{A1B2C3D4-1004-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.RestApi", "src\Illyrian.RestApi\Illyrian.RestApi.csproj", "{A1B2C3D4-1005-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.Resources", "src\Illyrian.Resources\Illyrian.Resources.csproj", "{A1B2C3D4-1006-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.Reports", "src\Illyrian.Reports\Illyrian.Reports.csproj", "{A1B2C3D4-1007-0000-0000-000000000001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illyrian.RestApi.Tests", "tests\Illyrian.RestApi.Tests\Illyrian.RestApi.Tests.csproj", "{A1B2C3D4-2001-0000-0000-000000000001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +26,48 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B1CADAE6-15D7-490D-950C-3A99B0B53EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1CADAE6-15D7-490D-950C-3A99B0B53EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1CADAE6-15D7-490D-950C-3A99B0B53EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1CADAE6-15D7-490D-950C-3A99B0B53EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1001-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1001-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1001-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1001-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1002-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1002-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1002-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1002-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1004-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1004-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1004-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1004-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1005-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1005-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1005-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1005-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1006-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1006-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1006-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1006-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-1007-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1007-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1007-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1007-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-2001-0000-0000-000000000001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-2001-0000-0000-000000000001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-2001-0000-0000-000000000001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-2001-0000-0000-000000000001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1B2C3D4-1001-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-1002-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-1004-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-1005-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-1006-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-1007-0000-0000-000000000001} = {A1B2C3D4-0001-0000-0000-000000000001}
+		{A1B2C3D4-2001-0000-0000-000000000001} = {A1B2C3D4-0002-0000-0000-000000000001}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A0CEB962-FC7B-457F-B29A-598A651596CA}
+		SolutionGuid = {09ED3382-B0AD-48E0-B294-3BC602D8982F}
 	EndGlobalSection
 EndGlobal

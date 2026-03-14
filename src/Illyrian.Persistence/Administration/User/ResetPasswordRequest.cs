@@ -1,0 +1,6 @@
+namespace Illyrian.Persistence.Administration.User;
+
+public class ResetPasswordRequest
+{
+    public string NewPassword { get; set; } = null!;
+}

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Illyrian.Domain/Illyrian.Domain.csproj" />
+    <Project Path="src/Illyrian.Infrastructure/Illyrian.Infrastructure.csproj" />
+    <Project Path="src/Illyrian.Persistence/Illyrian.Persistence.csproj" />
+    <Project Path="src/Illyrian.PersistenceSql/Illyrian.PersistenceSql.csproj" />
+    <Project Path="src/Illyrian.RestApi/Illyrian.RestApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Illyrian.Test/Illyrian.Test.csproj" />
+  </Folder>
+</Solution>

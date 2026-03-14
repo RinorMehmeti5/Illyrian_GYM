@@ -1,0 +1,37 @@
+using AutoMapper;
+using Illyrian.Domain.Entities;
+using Illyrian.Domain.Services.Auth;
+
+namespace Illyrian.Domain.AutoMapper;
+
+public class DomainMappingConfiguration : Profile
+{
+    public DomainMappingConfiguration()
+    {
+        CreateMap<Illyrian.Persistence.Auth.RegisterRequest, RegisterModel>();
+        CreateMap<Illyrian.Persistence.Administration.User.CreateUserRequest, CreateUserModel>();
+        CreateMap<Illyrian.Persistence.Administration.User.UpdateUserRequest, UpdateUserModel>();
+
+        CreateMap<User, Illyrian.Persistence.Administration.User.UserDto>()
+            .ForMember(d => d.FullName, opt => opt.MapFrom(s => $"{s.Firstname ?? ""} {s.Lastname ?? ""}".Trim()))
+            .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.Roles != null ? s.Roles.Select(r => r.Name ?? "").ToList() : new List<string>()));
+
+        CreateMap<Role, Illyrian.Persistence.Administration.User.RoleDto>();
+
+        CreateMap<Membership, Illyrian.Persistence.Membership.MembershipDto>()
+            .ForMember(d => d.MembershipTypeName, opt => opt.MapFrom(s => s.MembershipType != null ? s.MembershipType.Name : null))
+            .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.IsActive ?? false))
+            .ForMember(d => d.Price, opt => opt.MapFrom(s => s.MembershipType != null ? s.MembershipType.Price : 0))
+            .ForMember(d => d.DurationInDays, opt => opt.MapFrom(s => s.MembershipType != null ? s.MembershipType.DurationInDays : 0));
+
+        CreateMap<MembershipType, Illyrian.Persistence.MembershipType.MembershipTypeDto>()
+            .ForMember(d => d.MembershipTypeID, opt => opt.MapFrom(s => s.MembershipTypeId));
+
+        CreateMap<Payment, Illyrian.Persistence.Payment.PaymentDto>()
+            .ForMember(d => d.MembershipTypeName, opt => opt.MapFrom(s => s.Membership != null && s.Membership.MembershipType != null ? s.Membership.MembershipType.Name : null));
+
+        CreateMap<Schedule, Illyrian.Persistence.Schedule.ScheduleDto>();
+
+        CreateMap<Exercise, Illyrian.Persistence.Exercise.ExerciseDto>();
+    }
+}

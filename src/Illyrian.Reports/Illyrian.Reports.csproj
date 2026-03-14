@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Illyrian.Domain\Illyrian.Domain.csproj" />
+    <ProjectReference Include="..\Illyrian.Persistence\Illyrian.Persistence.csproj" />
+    <ProjectReference Include="..\Illyrian.Resources\Illyrian.Resources.csproj" />
+  </ItemGroup>
+</Project>
